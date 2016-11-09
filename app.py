@@ -9,10 +9,11 @@
 """
 import matplotlib
 matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 import requests
 import unicodedata
-import urllib
 from argparse import ArgumentParser
 from bs4 import BeautifulSoup as bs
 from os.path import join
@@ -42,7 +43,7 @@ def get_average(query, city, condition, min_price,
         href = row.find(class_='result-title')
         href = str(url + href.attrs.get('href', '').strip()) if href else ''
         price = row.find(class_='result-price')
-        price = str(price.text[1:].strip()) if price else ''
+        price = int(price.text[1:].strip()) if price else ''
         location = row.find(class_='result-hood')
         location = str(location.text.strip()) if location else ''
         data.append((name, href, price, location))
@@ -50,19 +51,17 @@ def get_average(query, city, condition, min_price,
     d.to_csv(items_path, index=False)
 
     r = s.find_all(class_='result-price')
-    prices = [int(a.text[1:]) for a in r]
-    average = sum(prices) / len(prices)
+    prices = pd.DataFrame([int(a.text[1:]) for a in r], columns=['price'])
+    average = int(prices['price'].mean())
+    mode = int(prices['price'].mode())
     df = pd.DataFrame(prices, columns=["price"])
-    df.describe().to_csv(table_path)
-    image = df.groupby(['price'])['price'].count()
-    image = pd.DataFrame(zip(image.index, image), columns=['price', 'count'])
-    image = image.plot(x='price', y='count')
-    image.set_title(query, fontsize=20)
-    image.set_xlabel('Price', fontsize=18)
-    image.set_ylabel('Count', fontsize=18)
-    figure = image.get_figure()
-    figure.savefig(image_path)
-    print "average_price = ${0}".format(average)
+    des = df.describe()
+    des.to_csv(table_path)
+    fig, ax = plt.subplots()
+    image = df.hist('price', bins=np.arange(int(des.min()), int(des.max()), 50), ax=ax)
+    fig.savefig(image_path)
+    print "average = ${0}".format(average)
+    print "mode = ${0}".format(mode)
     print "items_table_path = {0}".format(items_path)
     print "description_table_path = {0}".format(table_path)
     print "prices_image_path = {0}".format(image_path)
