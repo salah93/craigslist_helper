@@ -56,7 +56,10 @@ def get_mode(query, city, condition, min_price,
     mode = int(df['price'].mode())
     df.describe().to_csv(table_path)
     fig, ax = plt.subplots()
-    image = df.hist('price', bins=np.arange(int(df.min()), int(df.max()), 50), ax=ax)
+    image = df.hist('price', bins=np.arange(int(df.min()), int(df.max()), 50), ax=ax)[0]
+    image.set_title(query, fontsize=20)
+    image.set_xlabel('Price', fontsize=18)
+    image.set_ylabel('Count', fontsize=18)
     fig.savefig(image_path)
     print "average = ${0}".format(average)
     print "mode = ${0}".format(mode)
