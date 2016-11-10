@@ -19,9 +19,9 @@ from bs4 import BeautifulSoup as bs
 from os.path import join
 
 
-def get_average(query, city, condition, min_price,
-                postal, search_distance,
-                target_folder='.'):
+def get_mode(query, city, condition, min_price,
+             postal, search_distance,
+             target_folder='.'):
     table_path = join(target_folder, 'describe.csv')
     image_path = join(target_folder, 'prices.png')
     items_path = join(target_folder, 'items.csv')
@@ -63,7 +63,7 @@ def get_average(query, city, condition, min_price,
     print "items_table_path = {0}".format(items_path)
     print "description_table_path = {0}".format(table_path)
     print "prices_image_path = {0}".format(image_path)
-    return average
+    return mode
 
 
 if __name__ == '__main__':
@@ -76,4 +76,4 @@ if __name__ == '__main__':
     argument_parser.add_argument('--city', default="newyork")
     argument_parser.add_argument('--target_folder')
     args = argument_parser.parse_args()
-    query = get_average(args.query, args.city, args.condition, args.min_price, args.postal, args.search_distance, args.target_folder)
+    query = get_mode(args.query, args.city, args.condition, args.min_price, args.postal, args.search_distance, args.target_folder)
